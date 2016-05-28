@@ -2,11 +2,12 @@
   "globalDependencies": {
     "bunyan": "registry:dt/bunyan#0.0.0+20160412155112",
     "node": "registry:dt/node#6.0.0+20160524002506",
-    "restify": "registry:dt/restify#2.0.0+20160425141054"
+    "restify": "registry:dt/restify#2.0.0+20160425141054",
+    "tv4": "registry:dt/tv4#1.2.5+20160317120654"
   },
   "dependencies": {
-    "restify_errors": "github:SamuelMarks/restify-errors/restify_errors.d.ts",
-    "restify_validators": "github:SamuelMarks/restify-validators/restify_validators.d.ts",
+    "restify-errors": "github:SamuelMarks/restify-errors/restify-errors.d.ts",
+    "restify-validators": "github:SamuelMarks/restify-validators/restify-validators.d.ts",
     "waterline": "github:SamuelMarks/cust_typings/waterline/waterline.d.ts"
   }
 }
