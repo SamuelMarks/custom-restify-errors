@@ -8,6 +8,7 @@ declare module restify_errors {
         CustomError: CustomError;
         NotFoundError(string): void;
         WaterlineError(wl_error: WLError, statusCode?: number): void;
+        IncomingMessageError(wl_error: WLError, statusCode?: number): void;
     }
 
     export interface CustomError {

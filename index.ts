@@ -19,6 +19,9 @@ export function fmtError(error: WLError | Error | any, statusCode = 400) {
     if (error instanceof RestError) return error;
     else if (error.invalidAttributes || error.hasOwnProperty('internalQuery'))
         return new WaterlineError(error, statusCode);
+    else if (['status', 'text', 'method', 'path'].map(
+            k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
+        return new IncomingMessageError(error);
     else {
         Object.keys(error).map(k => console.log(k, '=', error[k]));
         throw TypeError('Unhandled input to fmtError:' + error)
@@ -76,3 +79,20 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
     );
 }
 inherits(WaterlineError, RestError);
+
+export function IncomingMessageError(error: {status: number, path: string, method: string, text: {}|string}) {
+    this.name = 'IncomingMessageError';
+    const error_title = `${error.status} ${error.method} ${error.path}`;
+    RestError.call(this, {
+            message: `${error_title} ${error.text}`,
+            statusCode: 500,
+            constructorOpt: IncomingMessageError,
+            restCode: this.name,
+            body: {
+                error: error_title,
+                error_message: error.text
+            }
+        }
+    );
+}
+inherits(IncomingMessageError, RestError);
