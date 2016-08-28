@@ -11,6 +11,6 @@ Otherwise just use the [restify-errors-dist](https://github.com/SamuelMarks/rest
 
 ## Miscellaneous
 
-Clone the dist repo in the same directory this repo was cloned into, then you can synchronise them with:
+Clone [restify-errors-dist](https://github.com/SamuelMarks/restify-errors-dist) one dir above where this repo was cloned, then synchronise with:
 
     find -type f -not -name "*.ts" -and -not -path "./.git/*" -and -not -path "./node-modules/*" -and -not -name '*.map' | cpio -pdamv ../restify-errors-dist

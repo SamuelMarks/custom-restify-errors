@@ -1,8 +1,8 @@
 {
   "globalDependencies": {
     "bunyan": "registry:dt/bunyan#0.0.0+20160412155112",
-    "node": "registry:dt/node#6.0.0+20160524002506",
-    "restify": "registry:dt/restify#2.0.0+20160425141054",
+    "node": "registry:env/node#6.0.0+20160825160117",
+    "restify": "registry:dt/restify#2.0.0+20160726153409",
     "tv4": "registry:dt/tv4#1.2.5+20160317120654"
   },
   "dependencies": {

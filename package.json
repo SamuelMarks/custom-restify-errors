@@ -1,6 +1,6 @@
 {
   "name": "restify-errors",
-  "version": "0.0.3",
+  "version": "0.0.4-alpha",
   "description": "Custom errors for the Node.JS restify framework",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/SamuelMarks/restify-errors#readme",
   "dependencies": {
-    "restify": "^4.1.0",
-    "waterline": "^0.12.1"
+    "restify": "^4.1.1",
+    "waterline": "^0.12.2"
   }
 }

@@ -55,6 +55,7 @@ inherits(NotFoundError, RestError);
 
 export function WaterlineError(wl_error: WLError, statusCode = 400) {
     this.name = 'WaterlineError';
+
     RestError.call(this, <CustomError>{
             message: wl_error.reason || wl_error.detail,
             statusCode: statusCode,
@@ -64,13 +65,16 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
                     error: {
                         /* TODO: populate with http://www.postgresql.org/docs/9.5/static/errcodes-appendix.html
                          *  Or use https://raw.githubusercontent.com/ericmj/postgrex/v0.11.1/lib/postgrex/errcodes.txt
-                         * */
-                        23505: 'unique_violation'
+                         */
+                        23505: 'unique_violation',
+                        E_UNIQUE: 'unique_violation'
                     }[wl_error.code],
                     error_message: wl_error.reason || wl_error.detail
                 }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata).length > 0 ? o : {})({
                     error_metadata: Object.assign({},
-                        wl_error.invalidAttributes ? {invalidAttributes: wl_error.invalidAttributes} : {},
+                        wl_error.invalidAttributes
+                        && wl_error.invalidAttributes.length !== 1
+                        || wl_error.invalidAttributes[0] !== undefined ? {invalidAttributes: wl_error.invalidAttributes} : {},
                         wl_error.details ? {details: wl_error.details.split('\n')} : {}
                     )
                 })
