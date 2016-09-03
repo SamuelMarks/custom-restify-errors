@@ -1,7 +1,7 @@
 import {RestError} from 'restify';
 import {inherits} from 'util';
 import {WLError} from 'waterline';
-import {CustomError} from 'restify_errors';
+import {CustomError} from 'restify-errors';
 
 interface IObjectCtor extends ObjectConstructor {
     assign(target: any, ...sources: any[]): any;
@@ -56,8 +56,13 @@ inherits(NotFoundError, RestError);
 export function WaterlineError(wl_error: WLError, statusCode = 400) {
     this.name = 'WaterlineError';
 
+    const msg = wl_error.detail !== undefined ?
+        wl_error.detail : wl_error.reason !== undefined && [
+        'Encountered an unexpected error', '1 attribute is invalid'].indexOf(wl_error.reason) < -1 ?
+        wl_error.reason : wl_error.message;
+
     RestError.call(this, <CustomError>{
-            message: wl_error.reason || wl_error.detail,
+            message: msg,
             statusCode: statusCode,
             constructorOpt: WaterlineError,
             restCode: this.name,
@@ -68,14 +73,17 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
                          */
                         23505: 'unique_violation',
                         E_UNIQUE: 'unique_violation'
-                    }[wl_error.code],
-                    error_message: wl_error.reason || wl_error.detail
+                    }[wl_error.code] || wl_error.code,
+                    error_code: wl_error.code,
+                    error_message: msg
                 }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata).length > 0 ? o : {})({
                     error_metadata: Object.assign({},
                         wl_error.invalidAttributes
-                        && wl_error.invalidAttributes.length !== 1
-                        || wl_error.invalidAttributes[0] !== undefined ? {invalidAttributes: wl_error.invalidAttributes} : {},
-                        wl_error.details ? {details: wl_error.details.split('\n')} : {}
+                        && (Object.keys(wl_error.invalidAttributes).length !== 1
+                        || JSON.stringify(wl_error.invalidAttributes) !== '{"0":[]}')
+                            ? {invalidAttributes: wl_error.invalidAttributes} : {},
+                        wl_error.details && wl_error.details !== 'Invalid attributes sent to undefined:\n \u2022 0\n'
+                            ? {details: wl_error.details.split('\n')} : {}
                     )
                 })
             )
