@@ -9,6 +9,7 @@ declare module restify_errors {
         NotFoundError(string): void;
         WaterlineError(wl_error: WLError, statusCode?: number): void;
         IncomingMessageError(wl_error: WLError, statusCode?: number): void;
+        GenericError(args: GenericErrorArgs): void;
     }
 
     export interface CustomError {
@@ -21,6 +22,13 @@ declare module restify_errors {
         message: string;
         constructorOpt: Function;
         restCode: string;
+    }
+
+    export interface GenericErrorArgs {
+        name?: string;
+        error: string;
+        error_message: string;
+        statusCode: number;
     }
 }
 

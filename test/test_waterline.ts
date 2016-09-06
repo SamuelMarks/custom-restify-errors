@@ -12,7 +12,8 @@ describe('WaterlineError', () => {
         const fmt_err = fmtError(error);
         expect(fmt_err.body).to.eql({
             error: 'unique_violation',
-            error_message: 'duplicate key value violates unique constraint "user_tbl_pkey"'
+            error_message: error.message,
+            error_code: error.code
         });
         expect(fmt_err.statusCode).to.be.equal(400);
     });

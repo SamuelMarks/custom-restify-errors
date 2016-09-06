@@ -1,7 +1,7 @@
 import {RestError} from 'restify';
 import {inherits} from 'util';
 import {WLError} from 'waterline';
-import {CustomError} from 'restify-errors';
+import {CustomError, GenericErrorArgs} from 'restify-errors';
 
 interface IObjectCtor extends ObjectConstructor {
     assign(target: any, ...sources: any[]): any;
@@ -23,22 +23,29 @@ export function fmtError(error: WLError | Error | any, statusCode = 400) {
             k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
         return new IncomingMessageError(error);
     else {
-        Object.keys(error).map(k => console.log(k, '=', error[k]));
+        Object.keys(error).map(k => console.error(k, '=', error[k]));
         throw TypeError('Unhandled input to fmtError:' + error)
     }
 }
 
-export const to_end = res => {
-    return {
-        NotFound: (entity = 'Entity') => res.json(404, {
-            error: 'NotFound', error_message: `${entity} not found`
-        })
-    }
-};
+export function GenericError(args: GenericErrorArgs) {
+    this.name = args.name || args.error;
+    RestError.call(this, <CustomError>{
+            restCode: this.name,
+            statusCode: args.statusCode,
+            message: `${args.error}: ${args.error_message}`,
+            constructorOpt: GenericError,
+            body: {
+                error: args.error,
+                error_message: args.error_message
+            }
+        }
+    );
+}
+inherits(GenericError, RestError);
 
-export function NotFoundError(entity = 'Entity') {
+export function NotFoundError(entity: string = 'Entity', msg: string = `${entity} not found`) {
     this.name = 'NotFoundError';
-    const msg = `${entity} not found`;
     RestError.call(this, <CustomError>{
             restCode: this.name,
             statusCode: 404,
@@ -80,7 +87,7 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
                     error_metadata: Object.assign({},
                         wl_error.invalidAttributes
                         && (Object.keys(wl_error.invalidAttributes).length !== 1
-                        || JSON.stringify(wl_error.invalidAttributes) !== '{"0":[]}')
+                        || ['{"0":[]}', '[null]'].indexOf(JSON.stringify(wl_error.invalidAttributes)) < -1)
                             ? {invalidAttributes: wl_error.invalidAttributes} : {},
                         wl_error.details && wl_error.details !== 'Invalid attributes sent to undefined:\n \u2022 0\n'
                             ? {details: wl_error.details.split('\n')} : {}
