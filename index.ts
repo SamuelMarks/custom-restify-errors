@@ -44,6 +44,22 @@ export function GenericError(args: GenericErrorArgs) {
 }
 inherits(GenericError, RestError);
 
+export function AuthError(msg: string = '', statusCode: number = 401) {
+    this.name = 'AuthError';
+    RestError.call(this, <CustomError>{
+            restCode: this.name,
+            statusCode: statusCode,
+            message: msg,
+            constructorOpt: AuthError,
+            body: {
+                error: this.name,
+                error_message: msg
+            }
+        }
+    );
+}
+inherits(AuthError, RestError);
+
 export function NotFoundError(entity: string = 'Entity', msg: string = `${entity} not found`) {
     this.name = 'NotFoundError';
     RestError.call(this, <CustomError>{

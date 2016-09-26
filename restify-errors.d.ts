@@ -8,6 +8,7 @@ declare module restify_errors {
         CustomError: CustomError;
         NotFoundError(string): void;
         WaterlineError(wl_error: WLError, statusCode?: number): void;
+        AuthError(msg: string, statusCode?: number): void;
         IncomingMessageError(wl_error: WLError, statusCode?: number): void;
         GenericError(args: GenericErrorArgs): void;
     }
