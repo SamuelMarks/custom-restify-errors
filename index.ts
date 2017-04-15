@@ -1,12 +1,12 @@
-import {RestError} from 'restify';
-import {inherits} from 'util';
-import {WLError} from 'waterline';
-import {CustomError, GenericErrorArgs} from 'restify-errors';
+import { RestError } from 'restify';
+import { inherits } from 'util';
+import { WLError } from 'waterline';
+import { ICustomError, GenericErrorArgs } from 'restify-errors';
 
 interface IObjectCtor extends ObjectConstructor {
     assign(target: any, ...sources: any[]): any;
 }
-declare var Object: IObjectCtor;
+declare const Object: IObjectCtor;
 
 export function fmtError(error: WLError | Error | any, statusCode = 400) {
     if (!error) return null;
@@ -24,13 +24,13 @@ export function fmtError(error: WLError | Error | any, statusCode = 400) {
         return new IncomingMessageError(error);
     else {
         Object.keys(error).map(k => console.error(k, '=', error[k]));
-        throw TypeError('Unhandled input to fmtError:' + error)
+        throw TypeError('Unhandled input to fmtError:' + error);
     }
 }
 
 export function GenericError(args: GenericErrorArgs) {
     this.name = args.name || args.error;
-    RestError.call(this, <CustomError>{
+    RestError.call(this, {
             restCode: this.name,
             statusCode: args.statusCode,
             message: `${args.error}: ${args.error_message}`,
@@ -39,30 +39,30 @@ export function GenericError(args: GenericErrorArgs) {
                 error: args.error,
                 error_message: args.error_message
             }
-        }
+        } as ICustomError
     );
 }
 inherits(GenericError, RestError);
 
 export function AuthError(msg: string = '', statusCode: number = 401) {
     this.name = 'AuthError';
-    RestError.call(this, <CustomError>{
+    RestError.call(this, {
             restCode: this.name,
-            statusCode: statusCode,
+            statusCode,
             message: msg,
             constructorOpt: AuthError,
             body: {
                 error: this.name,
                 error_message: msg
             }
-        }
+        } as ICustomError
     );
 }
 inherits(AuthError, RestError);
 
 export function NotFoundError(entity: string = 'Entity', msg: string = `${entity} not found`) {
     this.name = 'NotFoundError';
-    RestError.call(this, <CustomError>{
+    RestError.call(this, {
             restCode: this.name,
             statusCode: 404,
             message: msg,
@@ -71,7 +71,7 @@ export function NotFoundError(entity: string = 'Entity', msg: string = `${entity
                 error: this.name,
                 error_message: msg
             }
-        }
+        } as ICustomError
     );
 }
 inherits(NotFoundError, RestError);
@@ -81,12 +81,12 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
 
     const msg = wl_error.detail !== undefined ?
         wl_error.detail : wl_error.reason !== undefined && [
-        'Encountered an unexpected error', '1 attribute is invalid'].indexOf(wl_error.reason) < -1 ?
-        wl_error.reason : wl_error.message;
+            'Encountered an unexpected error', '1 attribute is invalid'].indexOf(wl_error.reason) < -1 ?
+            wl_error.reason : wl_error.message;
 
-    RestError.call(this, <CustomError>{
+    RestError.call(this, {
             message: msg,
-            statusCode: statusCode,
+            statusCode,
             constructorOpt: WaterlineError,
             restCode: this.name,
             body: Object.assign({
@@ -99,7 +99,7 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
                     }[wl_error.code] || wl_error.code,
                     error_code: wl_error.code,
                     error_message: msg
-                }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata).length > 0 ? o : {})({
+                }, ((o: { error_metadata?: {} }) => Object.keys(o.error_metadata).length > 0 ? o : {})({
                     error_metadata: Object.assign({},
                         wl_error.invalidAttributes
                         && (Object.keys(wl_error.invalidAttributes).length !== 1
@@ -110,12 +110,12 @@ export function WaterlineError(wl_error: WLError, statusCode = 400) {
                     )
                 })
             )
-        }
+        } as ICustomError
     );
 }
 inherits(WaterlineError, RestError);
 
-export function IncomingMessageError(error: {status: number, path: string, method: string, text: {}|string}) {
+export function IncomingMessageError(error: { status: number, path: string, method: string, text: {} | string }) {
     this.name = 'IncomingMessageError';
     const error_title = `${error.status} ${error.method} ${error.path}`;
     RestError.call(this, {

@@ -1,11 +1,13 @@
-import {WLError} from 'waterline';
+import { WLError } from 'waterline';
 
-declare var restify_errors: restify_errors.restify_errors;
+declare const restify_errors: restify_errors.restify_errors;
 
+/* tslint:disable:no-namespace no-internal-module */
 declare module restify_errors {
+    /* tslint:disable:class-name interface-name */
     export interface restify_errors {
+        ICustomError: ICustomError;
         fmtError(error: WLError | Error | any, statusCode?: number);
-        CustomError: CustomError;
         NotFoundError(string): void;
         WaterlineError(wl_error: WLError, statusCode?: number): void;
         AuthError(msg: string, statusCode?: number): void;
@@ -13,7 +15,7 @@ declare module restify_errors {
         GenericError(args: GenericErrorArgs): void;
     }
 
-    export interface CustomError {
+    export interface ICustomError {
         body: {
             error: string,
             error_message: string,
@@ -21,6 +23,7 @@ declare module restify_errors {
         };
         statusCode: number;
         message: string;
+        /* tslint:disable:ban-types */
         constructorOpt: Function;
         restCode: string;
     }

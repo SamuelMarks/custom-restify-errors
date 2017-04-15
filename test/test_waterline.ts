@@ -1,10 +1,12 @@
-import {expect} from 'chai';
-import {WaterlineError, fmtError} from '../index';
+import { expect } from 'chai';
+import { fmtError, WaterlineError } from '../index';
+
+/* tslint:disable:no-var-requires */
 const WLError = require('waterline/lib/waterline/error/WLError');
 
 describe('WaterlineError', () => {
     it('E_UNIQUE should be pretty parsed', () => {
-        let error = new WLError();
+        const error = new WLError();
         error.code = 'E_UNIQUE';
         error.message = 'duplicate key value violates unique constraint "user_tbl_pkey"';
         error.invalidAttributes = [undefined];
