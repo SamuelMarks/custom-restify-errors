@@ -1,6 +1,6 @@
 {
   "name": "custom-restify-errors",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Custom errors for the Node.JS restify framework",
   "main": "index.js",
   "scripts": {

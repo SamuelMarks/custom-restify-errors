@@ -129,7 +129,13 @@ export const fmtError = (error: Error | any, statusCode = 400): RestError | null
             k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
         return new IncomingMessageError(error);
     else {
-        Object.keys(error).map(k => console.error(k, '=', error[k]));
+        Object.keys(error).map(k => console.error(`error.${k} =`, error[k]));
+        if (error instanceof Error) return new GenericError({
+            name: error.name,
+            error: `${error.name}::${error.message}`,
+            error_message: error.message,
+            statusCode: 500
+        });
         throw TypeError('Unhandled input to fmtError:' + error);
     }
 };
