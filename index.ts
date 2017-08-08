@@ -79,7 +79,7 @@ export const WaterlineError = function(this: RestError, wl_error: Error | any, s
                     error_metadata: Object.assign({},
                         wl_error.invalidAttributes
                         && (Object.keys(wl_error.invalidAttributes).length !== 1
-                        || ['{"0":[]}', '[null]'].indexOf(JSON.stringify(wl_error.invalidAttributes)) < -1)
+                            || ['{"0":[]}', '[null]'].indexOf(JSON.stringify(wl_error.invalidAttributes)) < -1)
                             ? { invalidAttributes: wl_error.invalidAttributes } : {},
                         wl_error.details && wl_error.details !== 'Invalid attributes sent to undefined:\n \u2022 0\n'
                             ? { details: wl_error.details.split('\n') } : {}
@@ -109,6 +109,22 @@ export const IncomingMessageError = function(this: RestError,
 }  as any as {new (error: {status: number, path: string, method: string, text: {} | string}): RestError};
 inherits(IncomingMessageError, RestError);
 
+export const TypeOrmError = function(this: RestError, error: Error) {
+    this.name = 'TypeOrmError';
+    RestError.call(this, {
+            restCode: this.name,
+            statusCode: 400,
+            message: error.message,
+            constructorOpt: TypeOrmError,
+            body: {
+                error: this.name,
+                error_message: error.message
+            }
+        } as ICustomError
+    );
+} as any as {new (entity?: string, msg?: string): RestError};
+inherits(TypeOrmError, RestError);
+
 export const fmtError = (error: Error | any, statusCode = 400): RestError | null => {
     if (error == null) return null;
     else if (error.originalError != null) {
@@ -125,6 +141,8 @@ export const fmtError = (error: Error | any, statusCode = 400): RestError | null
             error_message: error,
             statusCode
         } as IGenericErrorArgs);
+    else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1 && error.stack.toString().indexOf('typeorm') > -1)
+        return new TypeOrmError(error);
     else if (['status', 'text', 'method', 'path'].map(
             k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
         return new IncomingMessageError(error);
