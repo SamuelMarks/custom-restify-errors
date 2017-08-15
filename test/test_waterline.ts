@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import * as indx from '../index';
+/*import { expect } from 'chai';
+import * as indx from '../index';*/
 
 /* tslint:disable:no-var-requires */
 // const WLError = require('waterline/lib/waterline/error/WLError');

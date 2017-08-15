@@ -2,6 +2,6 @@
   "dependencies": {
     "custom-restify-errors": "github:SamuelMarks/custom-restify-errors/custom-restify-errors.d.ts",
     "restify-validators": "github:SamuelMarks/restify-validators/restify-validators.d.ts",
-    "waterline": "github:SamuelMarks/cust_typings/waterline/waterline.d.ts"
+    "waterline": "github:SamuelMarks/cust_typings/waterline/waterline.d.ts#master"
   }
 }

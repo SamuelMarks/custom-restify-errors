@@ -1,5 +1,6 @@
-import { RestError } from 'restify-errors';
+import * as restify from 'restify';
 import { inherits } from 'util';
+import { RestError } from 'restify-errors';
 
 import { ICustomError, IGenericErrorArgs } from 'custom-restify-errors';
 
@@ -156,4 +157,10 @@ export const fmtError = (error: Error | any, statusCode = 400): RestError | null
         });
         throw TypeError('Unhandled input to fmtError:' + error);
     }
+};
+
+export const restCatch = (req: restify.Request, res: restify.Response, next: restify.Next) => (err: Error | any) => {
+    if (err != null) return next(fmtError(err));
+    res.json(200, req.body);
+    return next();
 };
