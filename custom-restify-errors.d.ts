@@ -38,7 +38,7 @@ export declare const GenericErrorBase: IRestError;
 
 export declare class GenericError extends GenericErrorBase {
     constructor(generic_error: {
-        cause: Error;
+        cause?: Error;
         name: string;
         message: string;
         info?: {};
@@ -47,11 +47,11 @@ export declare class GenericError extends GenericErrorBase {
 }
 
 export declare class AuthError extends GenericError {
-    constructor(cause: Error, message: string, statusCode?: number);
+    constructor(message: string, statusCode?: number, cause?: Error);
 }
 
 export declare class NotFoundError extends GenericError {
-    constructor(cause: Error, entity?: string, message?: string, statusCode?: number);
+    constructor(entity?: string, message?: string, statusCode?: number, cause?: Error);
 }
 
 export declare class WaterlineError extends GenericError {

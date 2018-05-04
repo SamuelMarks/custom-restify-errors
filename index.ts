@@ -10,7 +10,7 @@ export const GenericErrorBase: IRestError = restify_errors.makeConstructor('Gene
 }) as any as IRestError;
 
 export class GenericError extends GenericErrorBase {
-    constructor(generic_error: {cause: Error, name: string, message: string, info?: {}, statusCode: number}) {
+    constructor(generic_error: {cause?: Error, name: string, message: string, info?: {}, statusCode: number}) {
         super(generic_error.name || 'GenericError');
         this.message = `${generic_error.name}: ${generic_error.message}`;
         this.statusCode = generic_error.statusCode || 400;
@@ -28,16 +28,16 @@ export class GenericError extends GenericErrorBase {
 }
 
 export class AuthError extends GenericError {
-    constructor(cause: Error, message: string, statusCode: number = 403) {
+    constructor(message: string, statusCode: number = 403, cause?: Error) {
         super({ name: 'AuthError', cause, message, statusCode });
     }
 }
 
 export class NotFoundError extends GenericError {
-    constructor(cause: Error,
-                entity: string = 'Entity',
+    constructor(entity: string = 'Entity',
                 message: string = `${entity} not found`,
-                statusCode: number = 404) {
+                statusCode: number = 404,
+                cause?: Error) {
         super({ name: 'NotFoundError', cause, message, statusCode });
     }
 }
