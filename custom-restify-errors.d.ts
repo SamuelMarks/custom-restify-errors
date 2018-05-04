@@ -1,5 +1,9 @@
-import * as restify from 'restify';
+///<reference path="./node_modules/@types/restify/index.d.ts"/>
+import * as restify_errors from 'restify-errors';
 import { RestError } from 'restify-errors';
+import * as VError from 'verror';
+import { WLError } from 'waterline';
+import * as restify from 'restify';
 
 export interface ICustomError {
     body: {
@@ -14,23 +18,59 @@ export interface ICustomError {
     restCode: string;
 }
 
-export interface IGenericErrorArgs {
-    name?: string;
+export interface IGenericErrorArgs extends VError {
     error: string;
     error_message: string;
     statusCode: number;
 }
 
-export declare const GenericError: new (args: IGenericErrorArgs) => RestError;
-export declare const AuthError: new (msg: string, statusCode?: number | undefined) => RestError;
-export declare const NotFoundError: new (entity?: string | undefined, msg?: string | undefined) => RestError;
-export declare const WaterlineError: new (wl_error: any, statusCode?: number | undefined) => RestError;
-export declare const IncomingMessageError: new (error: {
-    status: number;
-    path: string;
-    method: string;
-    text: string | {};
-}) => RestError;
-export declare const TypeOrmError: new (entity?: string | undefined, msg?: string | undefined) => RestError;
-export declare const fmtError: (error: any, statusCode?: number) => RestError | null;
+export type RError = RestError & {jse_info: {}, jse_shortmsg: string};
+
+export interface IRestError {
+    _meta?: any;
+
+    new(message: string): RError;
+
+    new(obj: {cause: Error, info: {}}, message: string): RError;
+}
+
+export declare const GenericErrorBase: IRestError;
+
+export declare class GenericError extends GenericErrorBase {
+    constructor(generic_error: {
+        cause: Error;
+        name: string;
+        message: string;
+        info?: {};
+        statusCode: number;
+    });
+}
+
+export declare class AuthError extends GenericError {
+    constructor(cause: Error, message: string, statusCode?: number);
+}
+
+export declare class NotFoundError extends GenericError {
+    constructor(cause: Error, entity?: string, message?: string, statusCode?: number);
+}
+
+export declare class WaterlineError extends GenericError {
+    constructor(cause: WLError, statusCode?: number);
+}
+
+export declare class IncomingMessageError extends GenericError {
+    constructor(error: {
+                    status: number;
+                    path: string;
+                    method: string;
+                    text: {} | string;
+                },
+                statusCode?: number);
+}
+
+export declare class TypeOrmError extends GenericError {
+    constructor(cause: Error, statusCode?: number);
+}
+
+export declare const fmtError: (error: any, statusCode?: number) => restify_errors.RestError | null;
 export declare const restCatch: (req: restify.Request, res: restify.Response, next: restify.Next) => (err: any) => void;

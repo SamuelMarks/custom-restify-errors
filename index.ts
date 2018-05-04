@@ -1,69 +1,72 @@
-import * as restify from 'restify';
-import { inherits } from 'util';
+import * as restify_errors from 'restify-errors';
 import { RestError } from 'restify-errors';
+import * as restify from 'restify';
+import { WLError } from 'waterline';
 
-import { ICustomError, IGenericErrorArgs } from 'custom-restify-errors';
+import { IRestError } from './custom-restify-errors';
 
-export const GenericError = function(this: RestError, args: IGenericErrorArgs): void {
-    this.name = args.name || args.error;
-    return RestError.call(this, {
-            restCode: this.name,
-            statusCode: args.statusCode,
-            message: `${args.error}: ${args.error_message}`,
-            constructorOpt: GenericError,
-            body: {
-                error: args.error,
-                error_message: args.error_message
-            }
-        } as ICustomError
-    );
-} as any as {new (args: IGenericErrorArgs): RestError};
-inherits(GenericError, RestError);
+export const GenericErrorBase: IRestError = restify_errors.makeConstructor('GenericError', {
+    statusCode: 400, failureType: 'GenericError'
+}) as any as IRestError;
 
-export const AuthError = function(this: RestError, msg: string = '', statusCode: number = 401) {
-    this.name = 'AuthError';
-    RestError.call(this, {
-            restCode: this.name,
-            statusCode,
-            message: msg,
-            constructorOpt: AuthError,
-            body: {
-                error: this.name,
-                error_message: msg
-            }
-        } as ICustomError
-    );
-} as any as {new (msg: string, statusCode?: number): RestError};
-inherits(AuthError, RestError);
+export class GenericError extends GenericErrorBase {
+    constructor(generic_error: {cause: Error, name: string, message: string, info?: {}, statusCode: number}) {
+        super(generic_error.name || 'GenericError');
+        this.message = `${generic_error.name}: ${generic_error.message}`;
+        this.statusCode = generic_error.statusCode || 400;
+        this.cause = () => generic_error.cause;
+        (this as any as {info: {}}).info = this.body = Object.assign({
+                code: this.code, error: this.name, error_message: generic_error.message
+            }, this.hasOwnProperty('_meta') && (this as any as {_meta: any})._meta ?
+            { _meta: (this as any as {_meta: any})._meta } : {}
+        );
+        if (generic_error.info != null)
+            this.jse_info = generic_error.info;
+        /*error: args.error,
+        error_message: args.error_message*/
+    }
+}
 
-export const NotFoundError = function(this: RestError, entity: string = 'Entity', msg: string = `${entity} not found`) {
-    this.name = 'NotFoundError';
-    RestError.call(this, {
-            restCode: this.name,
-            statusCode: 404,
-            message: msg,
-            constructorOpt: NotFoundError,
-            body: {
-                error: this.name,
-                error_message: msg
-            }
-        } as ICustomError
-    );
-} as any as {new (entity?: string, msg?: string): RestError};
-inherits(NotFoundError, RestError);
+export class AuthError extends GenericError {
+    constructor(cause: Error, message: string, statusCode: number = 403) {
+        super({ name: 'AuthError', cause, message, statusCode });
+    }
+}
 
-export const WaterlineError = function(this: RestError, wl_error: Error | any, statusCode = 400) {
-    this.name = 'WaterlineError';
+export class NotFoundError extends GenericError {
+    constructor(cause: Error,
+                entity: string = 'Entity',
+                message: string = `${entity} not found`,
+                statusCode: number = 404) {
+        super({ name: 'NotFoundError', cause, message, statusCode });
+    }
+}
 
-    const msg = wl_error.detail !== undefined ?
-        wl_error.detail : wl_error.reason !== undefined && [
-            'Encountered an unexpected error', '1 attribute is invalid'].indexOf(wl_error.reason) < -1 ?
-            wl_error.reason : wl_error.message;
-    /* TODO: populate with http://www.postgresql.org/docs/9.5/static/errcodes-appendix.html
-     *  Or use https://raw.githubusercontent.com/ericmj/postgrex/v0.11.1/lib/postgrex/errcodes.txt
-     */
+const body = {
+    body: {
+        error: 'this.name',
+        error_message: ''
+    }
+};
 
-    RestError.call(this, {
+export class WaterlineError extends GenericError {
+    constructor(cause: WLError, statusCode: number = 400) {
+        super({
+            name: 'WaterlineError', cause: cause as any as Error,
+            message: cause.detail !== undefined ?
+                cause.detail : cause.reason !== undefined && [
+                    'Encountered an unexpected error', '1 attribute is invalid'].indexOf(cause.reason) < -1 ?
+                    cause.reason : cause.message || '',
+            statusCode
+        });
+    }
+
+    /*
+    private parser() {
+        // TODO: populate with http://www.postgresql.org/docs/9.5/static/errcodes-appendix.html
+        // Or use https://raw.githubusercontent.com/ericmj/postgrex/v0.11.1/lib/postgrex/errcodes.txt
+
+        const o = {
             message: msg,
             statusCode,
             constructorOpt: WaterlineError,
@@ -76,7 +79,7 @@ export const WaterlineError = function(this: RestError, wl_error: Error | any, s
                     )[wl_error.code]) as {} || wl_error.code,
                     error_code: wl_error.code,
                     error_message: msg
-                }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata).length > 0 ? o : {})({
+                }, ((o: {error_metadata?: {}}) => Object.keys(o.error_metadata as {}).length > 0 ? o : {})({
                     error_metadata: Object.assign({},
                         wl_error.invalidAttributes
                         && (Object.keys(wl_error.invalidAttributes).length !== 1
@@ -87,44 +90,31 @@ export const WaterlineError = function(this: RestError, wl_error: Error | any, s
                     )
                 })
             ) as any
-        } as any // ICustomError
-    );
-}  as any as {new (wl_error: Error | any, statusCode?: number): RestError};
-inherits(WaterlineError, RestError);
+        };
+    }
+    */
+}
 
-export const IncomingMessageError = function(this: RestError,
-                                             error: {status: number, path: string, method: string, text: {} | string}) {
-    this.name = 'IncomingMessageError';
-    const error_title = `${error.status} ${error.method} ${error.path}`;
-    RestError.call(this, {
-            message: `${error_title} ${error.text}`,
-            statusCode: 500,
-            constructorOpt: IncomingMessageError,
-            restCode: this.name,
-            body: {
-                error: error_title,
-                error_message: error.text
-            }
-        }
-    );
-}  as any as {new (error: {status: number, path: string, method: string, text: {} | string}): RestError};
-inherits(IncomingMessageError, RestError);
+export class IncomingMessageError extends GenericError {
+    constructor(error: {status: number, path: string, method: string, text: {} | string},
+                statusCode: number = 500) {
+        super({
+            name: 'IncomingMessageError',
+            cause: error as any as Error,
+            message: `${error.status} ${error.method} ${error.path}`,
+            statusCode
+        });
+        // error: `${error.status} ${error.method} ${error.path}`
+        // error_message: error.text
+        // message: `${error_title} ${error.text}`,
+    }
+}
 
-export const TypeOrmError = function(this: RestError, error: Error) {
-    this.name = 'TypeOrmError';
-    RestError.call(this, {
-            restCode: this.name,
-            statusCode: 400,
-            message: error.message,
-            constructorOpt: TypeOrmError,
-            body: {
-                error: this.name,
-                error_message: error.message
-            }
-        } as ICustomError
-    );
-} as any as {new (entity?: string, msg?: string): RestError};
-inherits(TypeOrmError, RestError);
+export class TypeOrmError extends GenericError {
+    constructor(cause: Error, statusCode: number = 400) {
+        super({ name: 'TypeOrmError', cause, message: cause.message, statusCode });
+    }
+}
 
 export const fmtError = (error: Error | any, statusCode = 400): RestError | null => {
     if (error == null) return null;
@@ -135,24 +125,25 @@ export const fmtError = (error: Error | any, statusCode = 400): RestError | null
     }
 
     if (error instanceof RestError) return error;
-    else if (error.invalidAttributes != null || error.hasOwnProperty('internalQuery'))
+    else if (error.hasOwnProperty('_e') && (error._e as Error).stack && error._e.stack.indexOf('WLError') > -1)
         return new GenericError({
             name: 'WLError',
-            error,
-            error_message: error,
+            cause: error._e,
+            message: error.hasOwnProperty('details') && error.details.length ? error.details : error.message,
             statusCode
-        } as IGenericErrorArgs);
+        });
     else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1 && error.stack.toString().indexOf('typeorm') > -1)
         return new TypeOrmError(error);
     else if (['status', 'text', 'method', 'path'].map(
-            k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
+        k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
         return new IncomingMessageError(error);
     else {
         Object.keys(error).map(k => console.error(`error.${k} =`, error[k]));
         if (error instanceof Error) return new GenericError({
             name: error.name,
-            error: `${error.name}::${error.message}`,
-            error_message: error.message,
+            cause: error,
+            // error: `${error.name}::${error.message}`,
+            message: error.message,
             statusCode: 500
         });
         throw TypeError('Unhandled input to fmtError:' + error);
