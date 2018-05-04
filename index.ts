@@ -11,19 +11,22 @@ export const GenericErrorBase: IRestError = restify_errors.makeConstructor('Gene
 
 export class GenericError extends GenericErrorBase {
     constructor(generic_error: {cause?: Error, name: string, message: string, info?: {}, statusCode: number}) {
-        super(generic_error.name || 'GenericError');
+        const name = generic_error.name == null ? 'GenericError' : generic_error.name;
+        super(name);
+        this.code = this.displayName = this.name = name;
         this.message = `${generic_error.name}: ${generic_error.message}`;
         this.statusCode = generic_error.statusCode || 400;
         this.cause = () => generic_error.cause;
-        (this as any as {info: {}}).info = this.body = Object.assign({
+        (this as any as {info: {}}).info = this.jse_info = this.body = Object.assign({
                 code: this.code, error: this.name, error_message: generic_error.message
             }, this.hasOwnProperty('_meta') && (this as any as {_meta: any})._meta ?
             { _meta: (this as any as {_meta: any})._meta } : {}
         );
         if (generic_error.info != null)
             this.jse_info = generic_error.info;
-        /*error: args.error,
-        error_message: args.error_message*/
+
+        // HACK
+        this.toJSON = () => this.jse_info;
     }
 }
 
@@ -116,7 +119,7 @@ export class TypeOrmError extends GenericError {
     }
 }
 
-export const fmtError = (error: Error | any, statusCode = 400): RestError | null => {
+export const fmtError = (error: Error | any, statusCode?: number): RestError | null => {
     if (error == null) return null;
     else if (error.originalError != null) {
         if (process.env['NO_DEBUG'] != null)
@@ -126,17 +129,12 @@ export const fmtError = (error: Error | any, statusCode = 400): RestError | null
 
     if (error instanceof RestError) return error;
     else if (error.hasOwnProperty('_e') && (error._e as Error).stack && error._e.stack.indexOf('WLError') > -1)
-        return new GenericError({
-            name: 'WLError',
-            cause: error._e,
-            message: error.hasOwnProperty('details') && error.details.length ? error.details : error.message,
-            statusCode
-        });
+        return new WaterlineError(error._e, statusCode);
     else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1 && error.stack.toString().indexOf('typeorm') > -1)
         return new TypeOrmError(error);
     else if (['status', 'text', 'method', 'path'].map(
         k => error.hasOwnProperty(k)).filter(v => v).length === Object.keys(error).length)
-        return new IncomingMessageError(error);
+        return new IncomingMessageError(error, statusCode);
     else {
         Object.keys(error).map(k => console.error(`error.${k} =`, error[k]));
         if (error instanceof Error) return new GenericError({

@@ -24,7 +24,11 @@ export interface IGenericErrorArgs extends VError {
     statusCode: number;
 }
 
-export type RError = RestError & {jse_info: {}, jse_shortmsg: string};
+export type RError = RestError & {
+    jse_info: {},
+    jse_shortmsg: string,
+    jse_cause: Error
+};
 
 export interface IRestError {
     _meta?: any;

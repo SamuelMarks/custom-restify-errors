@@ -2,6 +2,7 @@ import { expect } from 'chai';
 
 import { GenericError } from '..';
 import { RError } from '../custom-restify-errors.d';
+import { InternalServerError } from 'restify-errors';
 
 describe('GenericError', () => {
     it('GenericError should accept object arguments', () => {
@@ -22,10 +23,19 @@ describe('GenericError', () => {
         expect(error.cause()).to.be.instanceof(TypeError);
         expect(error.code).to.be.equal('E_UNIQUE');
         expect(error.body).to.deep.equal({
-            code: 'Generic',
+            code: 'GenericError',
             error: 'GenericError',
             error_message: 'some message'
         });
         expect((error as any as RError).jse_info).to.deep.equal(body);
+        console.info('GenericError =', error, ';');
+
+        console.info('InternalServerError =', new InternalServerError({
+            cause: new Error(),
+            info: {
+                foo: 'bar',
+                baz: 1
+            }
+        }, 'wrapped'), ';');
     });
 });
