@@ -103,7 +103,7 @@ export class WaterlineError extends GenericError {
 export class IncomingMessageError extends GenericError {
     constructor(error: {
                     statusCode: number,
-                    path: string,
+                    path: () => string,
                     method: string,
                     text?: {} | string,
                     headers: {}
@@ -112,7 +112,8 @@ export class IncomingMessageError extends GenericError {
         super({
             name: 'IncomingMessageError',
             cause: error as any as Error,
-            message: `${error.statusCode} ${error.method} ${error.path}\n${JSON.stringify(error.headers)}`,
+            message: `${error.statusCode}${error.method ? ' ' + error.method : ''} ${error.path()}\n
+                ${JSON.stringify(error.headers)}`,
             statusCode
         });
         // error: `${error.statusCode} ${error.method} ${error.path}`
