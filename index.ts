@@ -112,12 +112,13 @@ export class IncomingMessageError extends GenericError {
         super({
             name: 'IncomingMessageError',
             cause: error as any as Error,
-            message: JSON.stringify({
+            message: `${error.statusCode || statusCode} ${error.text}`,
+            info: {
                 statusCode: error.statusCode || statusCode,
                 method: error.method,
                 path: error.path(),
                 headers: error.headers
-            }),
+            },
             statusCode: error.statusCode || statusCode
         });
         // error: `${error.statusCode} ${error.method} ${error.path}`
