@@ -1,6 +1,6 @@
 {
   "name": "custom-restify-errors",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Custom errors for the Node.JS restify framework",
   "main": "index.js",
   "scripts": {
@@ -19,19 +19,19 @@
   "dependencies": {
     "@types/verror": "^1.10.3",
     "restify-errors": "^6.1.1",
-    "waterline": "^0.13.4"
+    "waterline": "^0.13.5"
   },
   "devDependencies": {
-    "@types/bunyan": "1.8.4",
-    "@types/chai": "^4.1.4",
-    "@types/mocha": "^5.2.3",
-    "@types/node": "^10.3.5",
-    "@types/restify": "^7.2.1",
+    "@types/bunyan": "1.8.5",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.10",
+    "@types/restify": "^7.2.6",
     "@types/restify-errors": "^4.3.3",
     "@types/tv4": "^1.2.29",
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
+    "ts-node": "^7.0.1",
+    "typescript": "^3.1.6"
   }
 }

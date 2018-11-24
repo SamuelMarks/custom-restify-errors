@@ -13,4 +13,6 @@ Otherwise just use the [custom-restify-errors-dist](https://github.com/SamuelMar
 
 Clone [custom-restify-errors-dist](https://github.com/SamuelMarks/custom-restify-errors-dist) one dir above where this repo was cloned, then synchronise with:
 
-    find -type f -not -name "*.ts" -and -not -path "./.git/*" -and -not -path "./node-modules/*" -and -not -name '*.map' | cpio -pdamv ../custom-restify-errors-dist
+     dst="${PWD##*/}"-dist;
+     find -type f -not -path './node_modules*' -a -not -path './.git*' -a -not -path './.idea*' -a -not -path './typings*' -a -not -name '*.ts' -not -name 'ts*' | cpio -pdamv ../"$dst";
+     sed -i "s/${PWD##*/}/$dst/g" ../"$dst"/{*.md,*.json};
