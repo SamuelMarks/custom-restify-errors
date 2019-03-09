@@ -1,4 +1,6 @@
+/* tslint:disable:no-reference */
 ///<reference path="./node_modules/@types/restify/index.d.ts"/>
+
 import * as restify_errors from 'restify-errors';
 import { RestError } from 'restify-errors';
 import * as VError from 'verror';

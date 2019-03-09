@@ -142,7 +142,8 @@ export const fmtError = (error: Error | any, statusCode?: number): RestError | n
     }
 
     if (error instanceof RestError) return error;
-    else if (error.hasOwnProperty('_e') && (error._e as Error).stack && error._e.stack.indexOf('WLError') > -1)
+    else if (error.hasOwnProperty('_e') && error.hasOwnProperty('code')
+        && error.hasOwnProperty('details') && error.hasOwnProperty('invalidAttributes'))
         return new WaterlineError(error._e, statusCode);
     else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1 && error.stack.toString().indexOf('typeorm') > -1)
         return new TypeOrmError(error);
