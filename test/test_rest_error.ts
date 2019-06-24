@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { InternalServerError } from 'restify-errors';
 
 import { GenericError } from '..';
-import { RError } from '../custom-restify-errors.d';
+import { RError } from '../index.d';
 
 describe('GenericError', () => {
     it('GenericError should accept object arguments', () => {

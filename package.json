@@ -1,6 +1,6 @@
 {
   "name": "@offscale/custom-restify-errors",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Custom errors for the Node.JS restify framework",
   "homepage": "https://github.com/SamuelMarks/custom-restify-errors#readme",
   "bugs": {
