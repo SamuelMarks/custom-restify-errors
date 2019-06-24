@@ -1,21 +1,21 @@
 {
   "name": "@offscale/custom-restify-errors",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Custom errors for the Node.JS restify framework",
-  "license": "(MIT OR Apache-2.0)",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha test --recursive --require ts-node/register"
+  "homepage": "https://github.com/SamuelMarks/custom-restify-errors#readme",
+  "bugs": {
+    "url": "https://github.com/SamuelMarks/custom-restify-errors/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SamuelMarks/custom-restify-errors.git"
   },
+  "license": "(MIT OR Apache-2.0)",
   "author": "Samuel Marks @SamuelMarks",
-  "bugs": {
-    "url": "https://github.com/SamuelMarks/custom-restify-errors/issues"
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test --recursive --require ts-node/register"
   },
-  "homepage": "https://github.com/SamuelMarks/custom-restify-errors#readme",
   "dependencies": {
     "@types/verror": "^1.10.3",
     "restify-errors": "^8.0.0",
