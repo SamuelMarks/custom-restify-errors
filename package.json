@@ -1,6 +1,6 @@
 {
   "name": "@offscale/custom-restify-errors",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Custom errors for the Node.JS restify framework",
   "homepage": "https://github.com/SamuelMarks/custom-restify-errors#readme",
   "bugs": {
@@ -14,6 +14,7 @@
   "author": "Samuel Marks @SamuelMarks",
   "main": "index.js",
   "scripts": {
+    "prepare": "tsc",
     "test": "mocha test --recursive --require ts-node/register"
   },
   "dependencies": {

@@ -1,10 +1,12 @@
 # blacklist all
 **
+
 # include whitelist
-!lib/**
+!lib/*
+!lib/test/*
 !test/*.js
 !*.js*
 !*.d.ts
 !*.md
 !LICENSE-*
-!typings
+!node_modules/@types

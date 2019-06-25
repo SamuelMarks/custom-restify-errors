@@ -3,7 +3,8 @@ import { RestError } from 'restify-errors';
 import * as restify from 'restify';
 import { WLError } from 'waterline';
 
-import { IRestError } from './index.d';
+import { IRestError } from './interfaces.d';
+
 
 export const GenericErrorBase: IRestError = restify_errors.makeConstructor('GenericError', {
     statusCode: 400, failureType: 'GenericError'
