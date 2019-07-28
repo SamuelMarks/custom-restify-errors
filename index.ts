@@ -130,7 +130,12 @@ export class IncomingMessageError extends GenericError {
 
 export class TypeOrmError extends GenericError {
     constructor(cause: Error, statusCode: number = 400) {
-        super({ name: 'TypeOrmError', cause, message: cause.message, statusCode });
+        super({
+            name: 'TypeOrmError',
+            message: cause.message,
+            statusCode: cause.message.indexOf('Could not find any entity of type') > -1 ? 404 : statusCode,
+            cause
+        });
     }
 }
 
