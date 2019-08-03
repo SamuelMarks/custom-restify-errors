@@ -133,7 +133,11 @@ export class TypeOrmError extends GenericError {
         super({
             name: 'TypeOrmError',
             message: cause.message,
-            statusCode: cause.message.indexOf('Could not find any entity of type') > -1 ? 404 : statusCode,
+            statusCode: (
+                cause.message.indexOf('Could not find any entity of type') > -1
+                || cause.message.indexOf('EntityNotFound') > -1
+            ) ? 404
+                : statusCode,
             cause
         });
     }
@@ -151,7 +155,9 @@ export const fmtError = (error: Error | any, statusCode?: number): RestError | n
     else if (error.hasOwnProperty('_e') && error.hasOwnProperty('code')
         && error.hasOwnProperty('details') && error.hasOwnProperty('invalidAttributes'))
         return new WaterlineError(error._e, statusCode);
-    else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1 && error.stack.toString().indexOf('typeorm') > -1)
+    else if (Object.getOwnPropertyNames(error).indexOf('stack') > -1
+        && error.stack.toString().indexOf('typeorm') > -1
+        || error.stack.toString().indexOf('EntityNotFound') > -1)
         return new TypeOrmError(error);
     else if (['statusCode', 'path', 'method', 'headers']
         .map(k => error.hasOwnProperty(k))
