@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+    - "lts/*"
+
+addons:
+    apt:
+        packages:
+            - gyp
+cache:
+    npm: true
+
+before_install:
+    - npm config set spin false
+    - npm install -g bunyan mocha node-gyp typescript
+
+install:
+    - typings install
+    - npm ci
+
+script:
+    - tsc
+    - npm test
+
+after_success:
+    - npm run coverage
