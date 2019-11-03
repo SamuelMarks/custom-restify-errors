@@ -11,7 +11,7 @@ cache:
 
 before_install:
     - npm config set spin false
-    - npm install -g bunyan mocha node-gyp typescript
+    - npm install -g bunyan mocha node-gyp typescript typings
 
 install:
     - typings install
