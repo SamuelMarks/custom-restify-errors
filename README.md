@@ -5,6 +5,7 @@ custom-restify-errors
 [![Coverage Status](https://coveralls.io/repos/github/SamuelMarks/custom-restify-errors/badge.svg)](https://coveralls.io/github/SamuelMarks/custom-restify-errors)
 ![David dependency status for latest release](https://david-dm.org/SamuelMarks/custom-restify-errors.svg)
 ![npm](https://img.shields.io/npm/v/@offscale/custom-restify-errors)
+![npm-publish](https://github.com/SamuelMarks/custom-restify-errors/workflows/npm-publish/badge.svg)
 
 Custom errors for the Node.JS restify framework.
 
