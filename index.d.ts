@@ -1,4 +1,4 @@
-import * as restify_errors from 'restify-errors';
+import { RestError } from 'restify-errors';
 import * as restify from 'restify';
 import { WLError } from 'waterline';
 import { IRestError } from './interfaces.d';
@@ -34,5 +34,5 @@ export declare class IncomingMessageError extends GenericError {
 export declare class TypeOrmError extends GenericError {
     constructor(cause: Error, statusCode?: number);
 }
-export declare const fmtError: (error: any, statusCode?: number | undefined) => restify_errors.RestError | null;
-export declare const restCatch: (req: restify.Request, res: restify.Response, next: restify.Next) => (err: any) => void;
+export declare const fmtError: (error: Error | any, statusCode?: number | undefined) => RestError | null;
+export declare const restCatch: (req: restify.Request, res: restify.Response, next: restify.Next) => (err: Error | any) => void;
