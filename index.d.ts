@@ -34,5 +34,5 @@ export declare class IncomingMessageError extends GenericError {
 export declare class TypeOrmError extends GenericError {
     constructor(cause: Error, statusCode?: number);
 }
-export declare const fmtError: (error: Error | any, statusCode?: number | undefined) => RestError | null;
+export declare const fmtError: (error: Error | any, statusCode?: number) => RestError | null;
 export declare const restCatch: (req: restify.Request, res: restify.Response, next: restify.Next) => (err: Error | any) => void;
