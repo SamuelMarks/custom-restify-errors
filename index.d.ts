@@ -1,3 +1,4 @@
+/// <reference path="typings/modules/waterline/index.d.ts" />
 import { RestError } from 'restify-errors';
 import * as restify from 'restify';
 import { WLError } from 'waterline';

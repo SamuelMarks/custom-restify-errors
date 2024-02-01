@@ -1,4 +1,6 @@
-import { expect } from 'chai';
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+
 import { InternalServerError } from 'restify-errors';
 
 import { RError } from '../interfaces.d';
@@ -20,15 +22,15 @@ describe('GenericError', () => {
         });
         error.code = 'E_UNIQUE';
 
-        expect(error.statusCode).to.be.equal(400);
-        expect(error.cause()).to.be.instanceof(TypeError);
-        expect(error.code).to.be.equal('E_UNIQUE');
-        expect(error.body).to.deep.equal({
+        assert.deepStrictEqual(error.statusCode, 400);
+        assert.deepStrictEqual(error.cause() instanceof TypeError, true);
+        assert.deepStrictEqual(error.code, 'E_UNIQUE');
+        assert.deepStrictEqual(error.body, {
             code: 'GenericError',
             error: 'GenericError',
             error_message: 'some message'
         });
-        expect((error as any as RError).jse_info).to.deep.equal(body);
+        assert.deepStrictEqual((error as any as RError).jse_info, body);
         console.info('GenericError =', error, ';');
 
         console.info('InternalServerError =', new InternalServerError({
